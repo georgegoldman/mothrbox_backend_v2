@@ -9,19 +9,11 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy only Cargo.toml first (Cargo.lock will be generated)
-COPY Cargo.toml ./
-
-# Create a dummy main.rs to cache dependencies
-RUN mkdir src && \
-    echo "fn main() {}" > src/main.rs && \
-    cargo build --release && \
-    rm -rf src
-
-# Now copy the actual source code
+# Copy manifests and source
+COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 
-# Build for release (this will use cached dependencies)
+# Build for release
 RUN cargo build --release
 
 # Verify binary exists
