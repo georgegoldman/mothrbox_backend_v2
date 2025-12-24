@@ -1,0 +1,25 @@
+services:
+  - name: mothrbox-backend
+    type: web
+    build:
+      builder: dockerfile
+      dockerfile: Dockerfile
+    instance_type: nano
+    ports:
+      - port: 8000
+        protocol: http
+    env:
+      - key: MONGODB_URI
+        secret: MONGODB_URI
+      - key: DATABASE_NAME
+        value: mothrbox_db
+      - key: JWT_SECRET
+        secret: JWT_SECRET
+    routes:
+      - path: /
+        port: 8000
+    regions:
+      - was
+    scalings:
+      min: 1
+      max: 1
