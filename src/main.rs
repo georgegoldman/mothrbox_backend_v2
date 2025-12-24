@@ -5,8 +5,10 @@ mod models;
 mod routes;
 mod services;
 
+use axum::http::{HeaderValue, Method};
 use dotenv::dotenv;
 use std::env;
+use tower_http::cors::{Any, CorsLayer};
 
 #[tokio::main]
 async fn main() {
@@ -65,8 +67,12 @@ async fn main() {
         }
     };
 
+    let cors_layer = CorsLayer::new()
+        .allow_origin("https://www.mothrbox.xyz".parse::<HeaderValue>().unwrap())
+        .allow_methods(Any);
+
     // Create the router with database state
-    let app = routes::create_router(db);
+    let app = routes::create_router(db).layer(cors_layer);
 
     // Get port from environment (Koyeb sets PORT)
     let port = env::var("PORT")
