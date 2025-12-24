@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mothrbox_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      # Comment these out for no authentication (easier for local dev)
+      # MONGO_INITDB_ROOT_USERNAME: admin
+      # MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: mothrbox
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+      # Uncomment if using mongo-init.js with authentication
+      # - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - mothrbox_network
+
+  # Optional: MongoDB Express (Web UI for MongoDB)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mothrbox_mongo_express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      # For MongoDB without authentication:
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/
+
+      # For MongoDB with authentication (comment above, uncomment below):
+      # ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      # ME_CONFIG_MONGODB_ADMINPASSWORD: password123
+      # ME_CONFIG_MONGODB_URL: mongodb://admin:password123@mongodb:27017/
+
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    depends_on:
+      - mongodb
+    networks:
+      - mothrbox_network
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+
+networks:
+  mothrbox_network:
+    driver: bridge
