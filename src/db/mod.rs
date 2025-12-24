@@ -15,11 +15,14 @@ impl MongoDb {
 
         let database_name = env::var("DATABASE_NAME").unwrap_or_else(|_| "mothrbox".to_string());
 
+        tracing::info!("Attempting to connect to MongoDB...");
+
         let client = Client::with_uri_str(&uri).await?;
         let database = client.database(&database_name);
 
         // Test the connection
-        // database.run_command(bson::doc! { "ping": 1 }).await?;
+        tracing::info!("Testing MongoDB connection...");
+        database.run_command(bson::doc! { "ping": 1 }).await?;
 
         tracing::info!(
             "Successfully connected to MongoDB database: {}",
